@@ -13,27 +13,27 @@ class Mondrian extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SegmentWidget (),
+      home: MondrianWidget(),
     );
   }
 }
 
-class _SegmentPainter extends CustomPainter {
-
+class _SquareCanvasPainter extends CustomPainter {
   double padding;
   Color color;
 
   Path path;
   double deviceWidth;
 
-  _SegmentPainter(context, this.padding, this.color) {
+  _SquareCanvasPainter(context, this.padding, this.color) {
     double width = MediaQuery.of(context).size.width - padding;
     double height = MediaQuery.of(context).size.height - padding;
+    double onePad = padding / 2;
 
     double sideLength = min(width, height);
     print(sideLength);
-    double startY = (height - sideLength) / 2;
-    double startX = (width - sideLength) / 2;
+    double startY = ((height - sideLength) / 2) + onePad;
+    double startX = ((width - sideLength) / 2) + onePad;
 
     path = new Path()
       ..moveTo(startX, startY)
@@ -44,14 +44,14 @@ class _SegmentPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SegmentPainter oldDelegate) {
+  bool shouldRepaint(_SquareCanvasPainter oldDelegate) {
     return oldDelegate.deviceWidth != deviceWidth ||
         oldDelegate.padding != padding ||
         oldDelegate.color != color;
   }
 
   @override
-  bool shouldRebuildSemantics(_SegmentPainter oldDelegate) => true;
+  bool shouldRebuildSemantics(_SquareCanvasPainter oldDelegate) => true;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -68,7 +68,7 @@ class _SegmentPainter extends CustomPainter {
   }
 }
 
-class SegmentWidget extends StatelessWidget {
+class MondrianWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new GestureDetector(
@@ -76,9 +76,14 @@ class SegmentWidget extends StatelessWidget {
       child: new SizedBox(
         width: MediaQuery.of(context).size.width - 10,
         height: MediaQuery.of(context).size.height - 10,
-        child: new CustomPaint(
-          painter: new _SegmentPainter(context, 20.0, Colors.white),
-        ),
+        child: new Stack(children: <Widget>[
+          new CustomPaint(
+            painter: new _SquareCanvasPainter(context, 20.0, Colors.white),
+          ),
+          new CustomPaint(
+            painter: new _SquareCanvasPainter(context, 40.0, Colors.blue),
+          )
+        ]),
       ),
     );
   }
