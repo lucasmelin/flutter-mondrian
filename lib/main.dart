@@ -74,7 +74,6 @@ class _SquareCanvasPainter extends CustomPainter {
   }
 }
 
-
 class _SquareQuadrantPainter extends CustomPainter {
   double padding;
   Color color;
@@ -82,7 +81,8 @@ class _SquareQuadrantPainter extends CustomPainter {
   Path path;
   double deviceWidth;
 
-  _SquareQuadrantPainter(context, segments, this.padding, this.color) {
+  _SquareQuadrantPainter(
+      context, segments, quadrant, this.padding, this.color) {
     double width = MediaQuery.of(context).size.width - padding;
     double height = MediaQuery.of(context).size.height - padding;
     double onePad = padding / 2;
@@ -96,16 +96,58 @@ class _SquareQuadrantPainter extends CustomPainter {
 
     path = new Path();
     path.moveTo(centerX, centerY);
-    if (segments > 0){
-      path.lineTo(centerX, startY + sideLength);
+
+    switch (quadrant) {
+      // Start by drawing left
+      case 1:
+        if (segments > 0) {
+          path.lineTo(startX, centerY);
+        }
+        if (segments > 2) {
+          path.lineTo(startX, startY);
+        }
+        if (segments > 3) {
+          path.lineTo(centerX, startY);
+        }
+        break;
+      // Start by drawing up
+      case 2:
+        if (segments > 0) {
+          path.lineTo(centerX, startY);
+        }
+        if (segments > 2) {
+          path.lineTo(startX + sideLength, startY);
+        }
+        if (segments > 3) {
+          path.lineTo(startX + sideLength, centerY);
+        }
+        break;
+      // Start by drawing right
+      case 3:
+        if (segments > 0) {
+          path.lineTo(startX + sideLength, centerY);
+        }
+        if (segments > 2) {
+          path.lineTo(startX + sideLength, startY + sideLength);
+        }
+        if (segments > 3) {
+          path.lineTo(centerX, startY + sideLength);
+        }
+        break;
+      // Start by drawing down
+      case 4:
+        if (segments > 0) {
+          path.lineTo(centerX, startY + sideLength);
+        }
+        if (segments > 2) {
+          path.lineTo(startX, startY + sideLength);
+        }
+        if (segments > 3) {
+          path.lineTo(startX, centerY);
+        }
+        break;
     }
-    if (segments > 2){
-     path.lineTo(centerX, startY + sideLength);
-     path.lineTo(startX, startY + sideLength);
-    }
-    if (segments > 3){
-      path.lineTo(startX, centerY);
-    }
+
     path.close();
   }
 
@@ -153,8 +195,21 @@ class MondrianWidget extends StatelessWidget {
             painter: new _SquareCanvasPainter(context, 20.0, Colors.white),
           ),
           new CustomPaint(
-            painter: new _SquareQuadrantPainter(context, 4, 20.0, Colors.blue),
-          )
+            painter:
+            new _SquareQuadrantPainter(context, 4, 1, 20.0, Colors.red),
+          ),
+          new CustomPaint(
+            painter:
+                new _SquareQuadrantPainter(context, 4, 2, 20.0, Colors.green),
+          ),
+          new CustomPaint(
+            painter:
+            new _SquareQuadrantPainter(context, 4, 3, 20.0, Colors.yellow),
+          ),
+          new CustomPaint(
+            painter:
+            new _SquareQuadrantPainter(context, 4, 4, 20.0, Colors.blue),
+          ),
         ]),
       ),
     );
