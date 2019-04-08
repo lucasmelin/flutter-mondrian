@@ -18,148 +18,98 @@ class Mondrian extends StatelessWidget {
   }
 }
 
-class _SquareCanvasPainter extends CustomPainter {
-  double padding;
+class _QuadrantPainter extends CustomPainter {
+  double pad;
   Color color;
 
   Path path;
-  double deviceWidth;
+  double devWidth;
 
-  _SquareCanvasPainter(context, this.padding, this.color) {
-    double width = MediaQuery.of(context).size.width - padding;
-    double height = MediaQuery.of(context).size.height - padding;
-    double onePad = padding / 2;
+  _QuadrantPainter(
+      context, segments, quadrant, this.pad, this.color) {
+    double w = MediaQuery.of(context).size.width - pad;
+    double h = MediaQuery.of(context).size.height - pad;
+    double onePad = pad / 2;
 
-    double sideLength = min(width, height);
-    print(sideLength);
-    double startY = ((height - sideLength) / 2) + onePad;
-    double startX = ((width - sideLength) / 2) + onePad;
+    double side = min(w, h);
+    double sY = ((h - side) / 2) + onePad;
+    double sX = ((w - side) / 2) + onePad;
 
-    path = new Path()
-      ..moveTo(startX, startY)
-      ..lineTo(startX, startY + sideLength)
-      ..lineTo(startX + sideLength, startY + sideLength)
-      ..lineTo(startX + sideLength, startY)
-      ..close();
-  }
-
-  @override
-  bool shouldRepaint(_SquareCanvasPainter oldDelegate) {
-    return oldDelegate.deviceWidth != deviceWidth ||
-        oldDelegate.padding != padding ||
-        oldDelegate.color != color;
-  }
-
-  @override
-  bool shouldRebuildSemantics(_SquareCanvasPainter oldDelegate) => true;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawPath(
-        path,
-        new Paint()
-          ..color = color
-          ..style = PaintingStyle.fill);
-    canvas.drawPath(
-        path,
-        new Paint()
-          ..color = Colors.black
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 3.0);
-  }
-
-  @override
-  bool hitTest(Offset position) {
-    return path.contains(position);
-  }
-}
-
-class _SquareQuadrantPainter extends CustomPainter {
-  double padding;
-  Color color;
-
-  Path path;
-  double deviceWidth;
-
-  _SquareQuadrantPainter(
-      context, segments, quadrant, this.padding, this.color) {
-    double width = MediaQuery.of(context).size.width - padding;
-    double height = MediaQuery.of(context).size.height - padding;
-    double onePad = padding / 2;
-
-    double sideLength = min(width, height);
-    double startY = ((height - sideLength) / 2) + onePad;
-    double startX = ((width - sideLength) / 2) + onePad;
-
-    double centerX = (MediaQuery.of(context).size.width) / 2;
-    double centerY = (MediaQuery.of(context).size.height) / 2;
+    double cX = (MediaQuery.of(context).size.width) / 2;
+    double cY = (MediaQuery.of(context).size.height) / 2;
 
     path = new Path();
-    path.moveTo(centerX, centerY);
-
+    path.moveTo(cX, cY);
     switch (quadrant) {
+      case 0:
+        // Outer canvas case
+        path
+          ..moveTo(sX, sY)
+          ..lineTo(sX, sY + side)
+          ..lineTo(sX + side, sY + side)
+          ..lineTo(sX + side, sY);
+        break;
       // Start by drawing left
       case 1:
         if (segments > 0) {
-          path.lineTo(startX, centerY);
+          path.lineTo(sX, cY);
         }
         if (segments > 2) {
-          path.lineTo(startX, startY);
+          path.lineTo(sX, sY);
         }
         if (segments > 3) {
-          path.lineTo(centerX, startY);
+          path.lineTo(cX, sY);
         }
         break;
       // Start by drawing up
       case 2:
         if (segments > 0) {
-          path.lineTo(centerX, startY);
+          path.lineTo(cX, sY);
         }
         if (segments > 2) {
-          path.lineTo(startX + sideLength, startY);
+          path.lineTo(sX + side, sY);
         }
         if (segments > 3) {
-          path.lineTo(startX + sideLength, centerY);
+          path.lineTo(sX + side, cY);
         }
         break;
       // Start by drawing right
       case 3:
         if (segments > 0) {
-          path.lineTo(startX + sideLength, centerY);
+          path.lineTo(sX + side, cY);
         }
         if (segments > 2) {
-          path.lineTo(startX + sideLength, startY + sideLength);
+          path.lineTo(sX + side, sY + side);
         }
         if (segments > 3) {
-          path.lineTo(centerX, startY + sideLength);
+          path.lineTo(cX, sY + side);
         }
         break;
       // Start by drawing down
       case 4:
         if (segments > 0) {
-          path.lineTo(centerX, startY + sideLength);
+          path.lineTo(cX, sY + side);
         }
         if (segments > 2) {
-          path.lineTo(startX, startY + sideLength);
+          path.lineTo(sX, sY + side);
         }
         if (segments > 3) {
-          path.lineTo(startX, centerY);
+          path.lineTo(sX, cY);
         }
         break;
     }
-
     path.close();
   }
 
   @override
-  bool shouldRepaint(_SquareQuadrantPainter oldDelegate) {
-    return oldDelegate.deviceWidth != deviceWidth ||
-        oldDelegate.padding != padding ||
+  bool shouldRepaint(_QuadrantPainter oldDelegate) {
+    return oldDelegate.devWidth != devWidth ||
+        oldDelegate.pad != pad ||
         oldDelegate.color != color;
   }
 
   @override
-  bool shouldRebuildSemantics(_SquareQuadrantPainter oldDelegate) => true;
+  bool shouldRebuildSemantics(_QuadrantPainter oldDelegate) => true;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -176,10 +126,6 @@ class _SquareQuadrantPainter extends CustomPainter {
           ..strokeWidth = 3.0);
   }
 
-  @override
-  bool hitTest(Offset position) {
-    return path.contains(position);
-  }
 }
 
 class MondrianWidget extends StatelessWidget {
@@ -188,27 +134,22 @@ class MondrianWidget extends StatelessWidget {
     List colors = [Colors.red, Colors.blue, Colors.green, Colors.yellow];
     int pieces = Random().nextInt(6) + 3;
 
-    final children = <Widget>[];
+    var paths = <Widget>[];
     // Add Canvas
-    children.add( new CustomPaint(
-      painter: new _SquareCanvasPainter(context, 20.0, Colors.white),
+    paths.add( new CustomPaint(
+      painter: new _QuadrantPainter(context, 4, 0, 20.0, Colors.white),
     ));
     for (var i = 0; i < pieces; i++){
-      int quadrant = (i ~/ 2) + 1;
+      int quad = (i ~/ 2) + 1;
       int shape = Random().nextInt(4) + 1;
-      print(shape);
-      print("Adding "+shape.toString()+" to "+quadrant.toString());
-      children.add(new CustomPaint(
-          painter: new _SquareQuadrantPainter(context, shape, quadrant, 20.0, colors[Random().nextInt(colors.length)])
+      paths.add(new CustomPaint(
+          painter: new _QuadrantPainter(context, shape, quad, 20.0, colors[Random().nextInt(colors.length)])
       ));
     }
-    return new GestureDetector(
-      onTap: () => print('Tapped Artwork'),
-      child: new SizedBox(
+    return new SizedBox(
         width: MediaQuery.of(context).size.width - 10,
         height: MediaQuery.of(context).size.height - 10,
-        child: new Stack(children: children),
-      ),
-    );
+        child: new Stack(children: paths),
+      );
   }
 }
