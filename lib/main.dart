@@ -185,32 +185,29 @@ class _SquareQuadrantPainter extends CustomPainter {
 class MondrianWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    List colors = [Colors.red, Colors.blue, Colors.green, Colors.yellow];
+    int pieces = Random().nextInt(6) + 3;
+
+    final children = <Widget>[];
+    // Add Canvas
+    children.add( new CustomPaint(
+      painter: new _SquareCanvasPainter(context, 20.0, Colors.white),
+    ));
+    for (var i = 0; i < pieces; i++){
+      int quadrant = (i ~/ 2) + 1;
+      int shape = Random().nextInt(4) + 1;
+      print(shape);
+      print("Adding "+shape.toString()+" to "+quadrant.toString());
+      children.add(new CustomPaint(
+          painter: new _SquareQuadrantPainter(context, shape, quadrant, 20.0, colors[Random().nextInt(colors.length)])
+      ));
+    }
     return new GestureDetector(
       onTap: () => print('Tapped Artwork'),
       child: new SizedBox(
         width: MediaQuery.of(context).size.width - 10,
         height: MediaQuery.of(context).size.height - 10,
-        child: new Stack(children: <Widget>[
-          new CustomPaint(
-            painter: new _SquareCanvasPainter(context, 20.0, Colors.white),
-          ),
-          new CustomPaint(
-            painter:
-            new _SquareQuadrantPainter(context, 4, 1, 20.0, Colors.red),
-          ),
-          new CustomPaint(
-            painter:
-                new _SquareQuadrantPainter(context, 4, 2, 20.0, Colors.green),
-          ),
-          new CustomPaint(
-            painter:
-            new _SquareQuadrantPainter(context, 4, 3, 20.0, Colors.yellow),
-          ),
-          new CustomPaint(
-            painter:
-            new _SquareQuadrantPainter(context, 4, 4, 20.0, Colors.blue),
-          ),
-        ]),
+        child: new Stack(children: children),
       ),
     );
   }
